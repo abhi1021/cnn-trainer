@@ -1,102 +1,164 @@
-# MNIST Digit Classifier (PyTorch)
+# CNN Trainer for MNIST Classification
 
-This project trains a **Convolutional Neural Network (CNN)** on the
-MNIST dataset (handwritten digits 0--9).\
-The goal is to keep the model **small (\~25K parameters)** while still
-achieving **95%+ accuracy**.
+A PyTorch implementation of a Convolutional Neural Network for MNIST digit classification, featuring modern deep learning techniques including batch normalization, dropout, and data augmentation.
 
-------------------------------------------------------------------------
+## 🚀 Model Architecture
 
-## 📂 Project Structure
+### Network Structure
+The model follows a carefully designed CNN architecture optimized for MNIST classification:
 
--   **Code Blocks 2--5** → Setup (device, transforms, dataset,
-    dataloaders)\
--   **Code Block 6** → Show a sample batch of images\
--   **Code Block 7** → CNN model (`Net`)\
--   **Code Block 8** → Placeholders for training/test results\
--   **Code Block 9** → Training and testing functions\
--   **Code Block 10** → Main training loop with optimizer, scheduler,
-    and early stopping
+```
+Input (28x28x1) 
+    ↓
+Conv2d(1→16, 3x3) + BatchNorm + ReLU → 26x26x16
+    ↓
+Conv2d(16→16, 3x3) + BatchNorm + ReLU → 24x24x16
+    ↓
+MaxPool2d(2x2) → 12x12x16
+    ↓
+Conv2d(16→16, 3x3) + BatchNorm + ReLU → 10x10x16
+    ↓
+Conv2d(16→32, 3x3) + BatchNorm + ReLU → 8x8x32
+    ↓
+MaxPool2d(2x2) → 4x4x32
+    ↓
+Conv2d(32→8, 1x1) → 4x4x8
+    ↓
+Conv2d(8→16, 3x3, pad=1) + BatchNorm + ReLU → 4x4x16
+    ↓
+Conv2d(16→16, 3x3) + BatchNorm + ReLU → 2x2x16
+    ↓
+Flatten → 64
+    ↓
+FC(64→40) + Dropout(0.1) + ReLU
+    ↓
+FC(40→10) + LogSoftmax
+    ↓
+Output (10 classes)
+```
 
-------------------------------------------------------------------------
+## 📊 Model Analysis
 
-## 🧠 Model Architecture
+### Total Parameter Count Test ✅
+**Approximately 16,426 parameters**
 
-The network is very lightweight but powerful enough for MNIST:
+**Detailed Parameter Breakdown:**
+- **Convolutional Layers:**
+  - conv1 (1→16): 160 parameters
+  - conv2 (16→16): 2,320 parameters  
+  - conv3 (16→16): 2,320 parameters
+  - conv4 (16→32): 4,640 parameters
+  - conv5 (32→8): 264 parameters
+  - conv6 (8→16): 1,168 parameters
+  - conv7 (16→16): 2,320 parameters
 
-    Input (1×28×28 grayscale)
-     ↓ Conv(16 filters, 3×3, padding=1) + BatchNorm + ReLU
-     ↓ MaxPool(2×2)   → 16×14×14
-     ↓ Conv(32 filters, 3×3, padding=1) + BatchNorm + ReLU
-     ↓ MaxPool(2×2)   → 32×7×7
-     ↓ Flatten        → 1568 features
-     ↓ Fully Connected (1568 → 64 or 128)
-     ↓ Dropout (0.25)
-     ↓ Fully Connected (→ 10 classes)
+- **Batch Normalization Layers:** ~224 parameters
+- **Fully Connected Layers:**
+  - fc1 (64→40): 2,600 parameters
+  - fc2 (40→10): 410 parameters
 
--   Total parameters: \~25K\
--   Small enough for fast training\
--   Still reaches **95--98% accuracy**
+### Use of Batch Normalization ✅
+**Implementation:** The model extensively uses Batch Normalization after most convolutional layers:
+- `bn1`: After conv1 (16 channels)
+- `bn2`: After conv2 (16 channels)  
+- `bn3`: After conv3 (16 channels)
+- `bn4`: After conv4 (32 channels)
+- `bn6`: After conv6 (16 channels)
+- `bn7`: After conv7 (16 channels)
 
-------------------------------------------------------------------------
+**Benefits:**
+- Accelerates training convergence
+- Provides regularization effect
+- Allows higher learning rates
+- Reduces internal covariate shift
 
-## ⚙️ Training Setup
+### Use of Dropout ✅
+**Implementation:** Dropout with probability 0.1 is applied before the final classification layer:
+```python
+self.drop = nn.Dropout(p=0.1)
+x = self.drop(F.relu(self.fc1(x)))
+```
 
--   **Optimizer**: Adam (`lr=0.001`)\
--   **Loss**: CrossEntropyLoss (standard for classification)\
--   **Scheduler**: ReduceLROnPlateau (reduces LR if accuracy plateaus)\
--   **Batch Size**: 128\
--   **Transforms**: Just normalization (no heavy augmentations, since
-    MNIST is already clean)
+**Benefits:**
+- Prevents overfitting
+- Improves model generalization
+- Acts as ensemble method during training
 
-We also use **early stopping** --- training ends automatically once test
-accuracy passes 95%.
+### Use of Fully Connected Layer ✅
+**Implementation:** The model uses two fully connected layers instead of Global Average Pooling:
 
-------------------------------------------------------------------------
+1. **FC1:** `nn.Linear(64, 40)` - Reduces feature dimensionality
+2. **FC2:** `nn.Linear(40, 10)` - Final classification layer
 
-## 📊 Results
+**Architecture Choice:**
+- Uses traditional FC layers instead of GAP (Global Average Pooling)
+- Provides more learnable parameters for complex decision boundaries
+- Suitable for MNIST's relatively simple feature space
 
--   **Epoch 1** → \~94--95% accuracy\
--   **Epoch 2--3** → \~96--97% accuracy\
--   **Epoch 5** → \~98% accuracy (with fc1 = 128)
+## 🔧 Training Configuration
 
-This is impressive for such a tiny network.
+### Data Augmentation
+```python
+train_transforms = transforms.Compose([
+    transforms.RandomApply([transforms.CenterCrop(22)], p=0.1),
+    transforms.Resize((28, 28)),
+    transforms.RandomRotation((-15., 15.), fill=0),
+    transforms.ToTensor(),
+    transforms.Normalize((0.1407,), (0.4081,))
+])
+```
 
-------------------------------------------------------------------------
+### Optimization
+- **Optimizer:** Adam (lr=0.001)
+- **Loss Function:** CrossEntropyLoss
+- **Scheduler:** StepLR (step_size=15, gamma=0.1)
+- **Batch Size:** 64
+- **Epochs:** 20
+
+### Hardware
+- **Device:** CUDA-enabled GPU training
+- **Memory Optimization:** Pin memory enabled for faster data loading
+
+## 📈 Performance Features
+
+### Training Monitoring
+- Real-time progress tracking with tqdm
+- Accuracy and loss tracking for both training and testing
+- Automatic model evaluation after each epoch
+
+### Visualization
+- Training/Testing loss and accuracy plots
+- Sample batch visualization with labels
+- Comprehensive performance analysis
+
+## 🏗️ Key Design Decisions
+
+1. **Efficient Architecture:** Balanced depth and width for optimal parameter usage
+2. **Modern Techniques:** Batch normalization for stable training
+3. **Regularization:** Strategic dropout placement to prevent overfitting
+4. **Data Pipeline:** Robust augmentation for improved generalization
+5. **Monitoring:** Comprehensive tracking for training insights
+
+## 🎯 Model Highlights
+
+- ✅ **Compact Design:** Under 17K parameters
+- ✅ **Modern Architecture:** BatchNorm + Dropout combination  
+- ✅ **Robust Training:** Data augmentation and learning rate scheduling
+- ✅ **GPU Optimized:** CUDA support with efficient data loading
+- ✅ **Comprehensive Monitoring:** Real-time metrics and visualization
 
 ## 🚀 How to Run
 
-1.  Install dependencies:
+1. Install dependencies:
+```bash
+pip install torch torchvision matplotlib tqdm torchsummary
+```
 
-    ``` bash
-    pip install torch torchvision matplotlib tqdm
-    ```
+2. Open and run the Jupyter notebook:
+```bash
+jupyter notebook Session_05.ipynb
+```
 
-2.  Run the training script (Python file with all code blocks).\
+3. The training will run for 20 epochs with automatic progress tracking
 
-3.  Training stops once accuracy \>95% (usually 1--2 epochs).
-
-------------------------------------------------------------------------
-
-## 🔑 Key Learnings
-
--   **Batch size matters**: Smaller batches (128 vs 1000) = faster
-    convergence.\
--   **Data augmentation**: Random crops/rotations actually slowed down
-    early accuracy.\
--   **Adam \> SGD**: Adam optimizer helped hit 95% in the first 1--2
-    epochs.\
--   **MaxPooling**: Helps shrink feature maps quickly → simpler FC layer
-    → better convergence.\
--   **Early stopping**: Saves time once the target accuracy is reached.
-
-------------------------------------------------------------------------
-
-## 📌 Next Steps
-
--   Try training for more epochs (up to 10) → reach 98%+\
--   Experiment with dropout values (0.25 → 0.5)\
--   Replace MaxPool with strided convolutions (like modern CNNs)\
--   Deploy this trained model on AWS Lambda or a simple Flask API
-
-------------------------------------------------------------------------
+This implementation demonstrates a well-engineered CNN that balances model complexity with performance, incorporating modern deep learning best practices for effective MNIST classification.

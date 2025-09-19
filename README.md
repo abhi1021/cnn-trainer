@@ -119,17 +119,69 @@ train_transforms = transforms.Compose([
 - **Device:** CUDA-enabled GPU training
 - **Memory Optimization:** Pin memory enabled for faster data loading
 
-## 📈 Performance Features
+## 📈 Training Results & Performance
 
-### Training Monitoring
-- Real-time progress tracking with tqdm
-- Accuracy and loss tracking for both training and testing
+### Model Training Logs
+The model was trained for 20 epochs with excellent performance progression:
+
+**Training Summary:**
+- **Total Parameters:** 16,426 (confirmed by torchsummary)
+- **Training Time:** ~23 seconds per epoch on GPU
+- **Final Test Accuracy:** 99.56%
+
+### Epoch-by-Epoch Test Accuracy Results
+
+| Epoch | Training Accuracy | Test Accuracy | Test Loss | Key Milestone |
+|-------|------------------|---------------|-----------|---------------|
+| **1** | 93.04% | **97.36%** | 0.0014 | Excellent first epoch performance |
+| **2** | 97.67% | **98.02%** | 0.0010 | Surpassed 98% test accuracy |
+| **3** | 98.19% | **98.34%** | 0.0008 | Steady improvement |
+| **4** | 98.39% | **98.48%** | 0.0007 | Consistent gains |
+| **5** | 98.60% | **98.68%** | 0.0006 | Approaching 99% |
+| **6** | 98.65% | **98.98%** | 0.0005 | **🎯 Broke 98.9% barrier** |
+| **7** | 98.74% | **98.96%** | 0.0005 | Stable high performance |
+| **8** | 98.70% | **98.96%** | 0.0005 | Maintained accuracy |
+| **9** | 98.81% | **99.09%** | 0.0004 | **🚀 First 99%+ result** |
+| **10** | 98.87% | **99.11%** | 0.0004 | Solid 99%+ performance |
+| **11** | 98.95% | **99.06%** | 0.0005 | Minor fluctuation |
+| **12** | 99.00% | **99.20%** | 0.0004 | Strong recovery |
+| **13** | 99.02% | **99.20%** | 0.0004 | Plateau at high accuracy |
+| **14** | 99.00% | **99.04%** | 0.0005 | Slight dip |
+| **15** | 99.08% | **99.28%** | 0.0004 | New peak reached |
+| **16** | 99.30% | **99.47%** | 0.0003 | **✨ Exceptional performance** |
+| **17** | 99.41% | **99.52%** | 0.0002 | **🏆 Peak test accuracy** |
+| **18** | 99.49% | **99.55%** | 0.0002 | Near-perfect results |
+| **19** | 99.47% | **99.58%** | 0.0002 | **🎖️ Highest test accuracy** |
+| **20** | 99.47% | **99.56%** | 0.0002 | Consistent final performance |
+
+### Performance Analysis
+
+**🔍 Key Observations:**
+- **Rapid Initial Convergence:** Achieved 97.36% test accuracy in just the first epoch
+- **Consistent Improvement:** Steady accuracy gains throughout training
+- **Excellent Generalization:** Test accuracy consistently matched or exceeded training accuracy
+- **Stable Training:** No significant overfitting observed
+- **Peak Performance:** Achieved maximum test accuracy of 99.58% at epoch 19
+
+**🎯 Training Milestones:**
+- **Epoch 1:** 97.36% - Excellent baseline performance
+- **Epoch 2:** 98.02% - Surpassed 98% threshold  
+- **Epoch 6:** 98.98% - Nearly 99% accuracy
+- **Epoch 9:** 99.09% - First 99%+ result
+- **Epoch 17-19:** 99.52-99.58% - Peak performance range
+
+### Performance Features
+
+**Training Monitoring:**
+- Real-time progress tracking with tqdm progress bars
+- Batch-level accuracy and loss reporting
 - Automatic model evaluation after each epoch
+- Learning rate scheduling with StepLR
 
-### Visualization
+**Visualization:**
 - Training/Testing loss and accuracy plots
-- Sample batch visualization with labels
-- Comprehensive performance analysis
+- Sample batch visualization with ground truth labels
+- Comprehensive performance analysis charts
 
 ## 🏗️ Key Design Decisions
 

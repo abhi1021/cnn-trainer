@@ -1,5 +1,32 @@
 # Session 8 - Deep Residual Network Training
 
+## Overview
+
+- **Model:** WideResNet-28-10
+- **Dataset:** CIFAR-100
+- **Task:** Image Classification (100 classes)
+- **Target Accuracy:** 74-75% test accuracy within 100 epochs
+
+---
+
+## Training Configuration
+
+| Parameter            | Value                                   |
+|----------------------|-----------------------------------------|
+| Depth                | 28                                      |
+| Width                | 10 (widen factor)                       |
+| Parameters           | ~36.5M                                  |
+| Batch Size           | 256                                     |
+| Dropout              | 0.3 (Epochs 1-60) → 0.2 (Epochs 61-100) |
+| Augmentation         | Full (Epochs 1-60) → Reduced (61-100)   |
+| MixUp alpha          | 0.2 (Epochs 1-60) → 0.15 (Epochs 61-100)|
+| Label Smoothing      | 0.1 (constant)                          |
+| Optimizer            | SGD (lr=0.01 start, momentum=0.9, wd=1e-3)|
+| LR Schedule          | Phase 1: CosineAnnealingWarmRestarts (T₀=25), Phase 2: CosineAnnealingLR |
+| Max LR               | 0.1                                     |
+| Storage              | Google Drive (keep last 5 ckpts), HuggingFace (every 10 epochs + best model) |
+| Patience (early stop)| 15 epochs                               |
+
 ## Model Architecture
 
 The model is a deep residual network with the following characteristics:
@@ -22,7 +49,9 @@ The model consists of:
 - AdaptiveAvgPool2d for global average pooling
 
 ## Training Results
-<video width="630" height="300" src="./epoch_log.mov" controls></video>   
+
+[Download and watch local.mov](epoch_log.mov)
+ 
 ![Training and Test Metrics](./graph.jpg)
 
 ### Performance Summary

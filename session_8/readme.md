@@ -50,7 +50,7 @@ The model consists of:
 
 ## Training Results
 
-[Download and watch local.mov](epoch_log.mov)
+[Output](output.gif)
  
 ![Training and Test Metrics](./graph.jpg)
 

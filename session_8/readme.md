@@ -47,10 +47,10 @@ The model consists of:
 - Progressive channel expansion: 64 → 128 → 256 → 512
 - Dropout layer (p=0.512) before the final linear layer
 - AdaptiveAvgPool2d for global average pooling
-
+    
 ## Training Results
 
-[Output](output.gif)
+![Epoch Logs](./epoch.png)
  
 ![Training and Test Metrics](./graph.jpg)
 

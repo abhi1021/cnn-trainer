@@ -12,8 +12,8 @@ The model is a deep residual network with the following characteristics:
 
 ### Architecture Details
 
-![Model Architecture Part 1](./param_1.jpg)
-![Model Architecture Part 2](./param_2.jpg)
+![Model Architecture Part 1](./param_1.png)
+![Model Architecture Part 2](./param_2.png)
 
 The model consists of:
 - Multiple residual blocks with Conv2d, BatchNorm2d, and ReLU layers
